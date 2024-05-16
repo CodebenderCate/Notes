@@ -8,6 +8,8 @@
 - CASP+
 
 ## HackTheBox
+### [HTB Certified Bug Bounty Hunter (HTB CBBH)](https://academy.hackthebox.com/preview/certifications/htb-certified-bug-bounty-hunter/)
+- [Bug Bounty for Beginners](https://github.com/CodebenderCate/Notes/blob/main/Bug%20Bounty%20for%20Beginners.md)
 
 ## TryHackMe
 

@@ -4,7 +4,7 @@
 ## CompTIA
 - Security+
 - CYSA+
-- [PenTest+](https://github.com/CodebenderCate/Notes/blob/main/Files/PenTest+.md) [(Cheat Sheet)](https://github.com/CodebenderCate/Notes/blob/main/Files/PenTesting%20Cheat%20Sheet.md)
+- [PenTest+](https://github.com/CodebenderCate/Notes/blob/main/Files/PenTest+.md) and a [Cheat Sheet](https://github.com/CodebenderCate/Notes/blob/main/Files/PenTesting%20Cheat%20Sheet.md)
 - CASP+
 
 ## HackTheBox

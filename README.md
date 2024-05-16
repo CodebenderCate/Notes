@@ -1,4 +1,6 @@
 # Notes
+### This list is a work in progress - literally
+
 ## CompTIA
 - Security+
 - CYSA+

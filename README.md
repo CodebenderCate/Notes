@@ -8,14 +8,14 @@
 - CASP+
 
 ## HackTheBox
-### Certified Bug Bounty Hunter (HTB CBBH)
+#### Certified Bug Bounty Hunter (HTB CBBH)
 - [Bug Bounty for Beginners](https://github.com/CodebenderCate/Notes/blob/main/Files/Bug%20Bounty%20for%20Beginners.md)
 
-### Certified Penetration Testing Specialist (HTB CPTS) 
+#### Certified Penetration Testing Specialist (HTB CPTS) 
 
-### Certified Defensive Security Analyst (HTB CDSA)
+#### Certified Defensive Security Analyst (HTB CDSA)
 
-### Certified Web Exploitation Expert (HTB CWEE)
+#### Certified Web Exploitation Expert (HTB CWEE)
 
 ## TryHackMe
 

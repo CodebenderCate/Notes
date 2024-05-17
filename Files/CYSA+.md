@@ -1,4 +1,8 @@
-# CompTIA CySA+ CS0-003 Notes
+<div align="center" dir="auto">
+<img src="https://github.com/CodebenderCate/codebendercate/blob/main/Images/Cysa+.jpg" width="400 height="100"/>
+</div>
+
+# <div align="center" dir="auto">My Notes for CYSA+ (2024)</div>
 
 ## Domain 1: Security Operations (33%)
 

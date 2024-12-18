@@ -1,8 +1,6 @@
 # Python Code to Install Cybersecurity Tools on Kali Linux
 ## This code will auto upgrade, auto update, and auto fix everything prior to installing a list of tools needed for cybersecurity work
 
-# Tools List and Informational Links
-
 ## Reconnaissance
 - [nmap](https://nmap.org) - Network mapper.
 - [nikto](https://cirt.net/Nikto2) - Web server scanner.

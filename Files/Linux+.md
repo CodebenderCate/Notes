@@ -150,7 +150,6 @@ This guide simplifies the objectives for the CompTIA Linux+ XK0-006 exam, breaki
 ---
 
 ### Additional Resources
-- **Official Objectives:** [CompTIA Linux+ Exam Objectives](https://www.comptia.org).
 - **Books:** 
   - *"CompTIA Linux+ Study Guide"* by Christine Bresnahan and Richard Blum.
 - **Online Courses:** [Linux Academy](https://linuxacademy.com).

@@ -16,7 +16,7 @@ This guide simplifies the objectives for the CompTIA Linux+ XK0-006 exam, breaki
     - **Bootloader:** GRUB loads the kernel and can be configured using `/etc/default/grub`.
     - **Kernel:** The core of the OS, managing hardware and software interactions.
     - **Init Systems:** Systemd is the default in most modern distros, managing services and dependencies.
-  - **Practice:** HackTheBox: [Linux Fundamentals](https://academy.hackthebox.com/module/18/section/94), TryHackMe: [Linux Basics](https://tryhackme.com/room/linuxbasics).
+  - **Practice:** HackTheBox: [Linux Fundamentals](https://academy.hackthebox.com/module/18/section/94), TryHackMe: [Linux Fundamentals](https://tryhackme.com/r/module/linux-fundamentals).
 
 - **Filesystem Hierarchy Standard (FHS):** Understand key directories like `/etc`, `/var`, `/home`, and `/usr`.
   - *Example:* `/etc` stores configuration files, while `/var` contains logs.
@@ -34,7 +34,7 @@ This guide simplifies the objectives for the CompTIA Linux+ XK0-006 exam, breaki
   - **Key Points:**
     - Filesystem types include ext4 (default for most Linux distros), xfs (high performance), and btrfs (advanced features).
     - Use `/etc/fstab` to define mount points.
-  - **Practice:** TryHackMe: [Linux PrivEsc](https://tryhackme.com/room/linuxprivesc).
+  - **Practice:** TryHackMe: [Linux Privilege Escalation](https://tryhackme.com/r/room/linprivesc).
 
 - **Logical Volume Manager (LVM):** Manage physical volumes (`pvcreate`), volume groups (`vgcreate`), and logical volumes (`lvcreate`).
   - **Key Commands:**
@@ -61,7 +61,6 @@ This guide simplifies the objectives for the CompTIA Linux+ XK0-006 exam, breaki
   - **Key Points:**
     - Hard links point directly to the inode and don’t break if the original file is moved.
     - Use `find` with options like `-exec` for powerful file searches.
-  - **Practice:** TryHackMe: [Introduction to Linux](https://tryhackme.com/room/introtolinux).
 
 - **Permissions:** Use `chmod`, `chown`, and `chgrp` to manage file permissions.
   - *Example:* `chmod 755 file` sets read/write/execute for owner and read/execute for others.
@@ -88,7 +87,7 @@ This guide simplifies the objectives for the CompTIA Linux+ XK0-006 exam, breaki
   - **Key Points:**
     - SSH key-based authentication uses public/private key pairs.
     - Use tools like `scp` and `sftp` for secure file transfers.
-  - **Practice:** TryHackMe: [Intro to SSH](https://tryhackme.com/room/introtoSSH).
+  - **Research:** TryHackMe: [How to SSH](https://help.tryhackme.com/en/articles/6502085-how-to-ssh-into-a-machine).
 
 - **SELinux:** Use `getenforce`, `setenforce`, and `audit2allow` to manage SELinux policies.
   - **Key Points:**
@@ -123,7 +122,7 @@ This guide simplifies the objectives for the CompTIA Linux+ XK0-006 exam, breaki
   - **Key Points:**
     - Ansible is agentless and uses YAML for configuration.
     - Roles and playbooks simplify large deployments.
-  - **Practice:** TryHackMe: [Ansible Basics](https://tryhackme.com/room/ansible).
+  - **Read:** : [Ansible Tutorial for Beginners: Ultimate Playbook & Examples](https://spacelift.io/blog/ansible-tutorial).
 
 ### 4.2 Shell Scripting
 - **Basics:** Use loops (`for`, `while`) and conditionals (`if`, `case`).
@@ -145,12 +144,12 @@ This guide simplifies the objectives for the CompTIA Linux+ XK0-006 exam, breaki
 ### 5.2 Troubleshoot Networking
 - **Tools:** Use `ping`, `traceroute`, and `tcpdump` to identify issues.
   - *Example:* `tcpdump -i eth0 port 22` captures SSH traffic.
-  - **Practice:** TryHackMe: [Network Tools](https://tryhackme.com/room/networktools).
+  - **Practice:** TryHackMe: [Network Explitation Basics](https://tryhackme.com/r/module/intro-to-networking).
 
 ---
 
 ### Additional Resources
 - **Books:** 
   - *"CompTIA Linux+ Study Guide"* by Christine Bresnahan and Richard Blum.
-- **Online Courses:** [Linux Academy](https://linuxacademy.com).
-- **Forums:** [Reddit Linux+ Subreddit](https://www.reddit.com/r/linuxplus/).
+- **Online Courses:** [Linux Academy](https://www.youtube.com/channel/UClGShptNEuvTWGAAfpa2Etw).
+- **Forums:** [Reddit CompTIA Subreddit](https://www.reddit.com/r/CompTIA/).

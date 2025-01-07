@@ -16,7 +16,7 @@ This guide simplifies the objectives for the CompTIA Linux+ XK0-006 exam, breaki
     - **Bootloader:** GRUB loads the kernel and can be configured using `/etc/default/grub`.
     - **Kernel:** The core of the OS, managing hardware and software interactions.
     - **Init Systems:** Systemd is the default in most modern distros, managing services and dependencies.
-  - **Practice:** HackTheBox: [Linux Fundamentals](https://www.hackthebox.com), TryHackMe: [Linux Basics](https://tryhackme.com/room/linuxbasics).
+  - **Practice:** HackTheBox: [Linux Fundamentals](https://academy.hackthebox.com/module/18/section/94), TryHackMe: [Linux Basics](https://tryhackme.com/room/linuxbasics).
 
 - **Filesystem Hierarchy Standard (FHS):** Understand key directories like `/etc`, `/var`, `/home`, and `/usr`.
   - *Example:* `/etc` stores configuration files, while `/var` contains logs.
@@ -50,7 +50,7 @@ This guide simplifies the objectives for the CompTIA Linux+ XK0-006 exam, breaki
   - **Key Points:**
     - Static IP configurations can be set in `/etc/netplan/` or `/etc/network/interfaces`.
     - Use `ping` and `traceroute` for basic connectivity checks.
-  - **Practice:** HackTheBox: [Networking Basics](https://www.hackthebox.com).
+  - **Practice:** HackTheBox: [Introduction to Networking](https://academy.hackthebox.com/module/34/section/297).
 
 ---
 
@@ -103,7 +103,7 @@ This guide simplifies the objectives for the CompTIA Linux+ XK0-006 exam, breaki
 
 - **Firewall Management:** Use `iptables`, `firewalld`, or `ufw`.
   - *Example:* `ufw allow 22/tcp` opens port 22 for SSH.
-  - **Practice:** HackTheBox: [Firewall Basics](https://www.hackthebox.com).
+  - **Practice:** HackTheBox: [Firewall and IDS/IPS Evasion](https://academy.hackthebox.com/module/19/section/117)).
 
 ---
 

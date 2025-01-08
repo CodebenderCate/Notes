@@ -51,6 +51,8 @@
 - [john](https://www.openwall.com/john/) - Versatile password cracking tool.
 - [hashcat](https://hashcat.net/hashcat/) - High-performance password recovery tool.
 - [hydra](https://github.com/vanhauser-thc/thc-hydra) - Fast and flexible password brute-forcer.
+- [pdfcrack](https://www.kali.org/tools/pdfcrack/) - Recover passwords and content from PDF-files
+- [steghide](https://www.kali.org/tools/steghide/) - hide data in various kinds of image and audio files
 #### Network Analysis and Traffic Monitoring
 - [wireshark](https://www.wireshark.org) - Network protocol analyzer and packet sniffer.
 - [tcpdump](https://www.tcpdump.org) - Lightweight command-line packet analyzer.
@@ -61,6 +63,7 @@
 - [binwalk](https://github.com/ReFirmLabs/binwalk) - Firmware analysis and extraction tool.
 - [yara](https://virustotal.github.io/yara/) - Malware identification and classification tool.
 - [strings](https://man7.org/linux/man-pages/man1/strings.1.html) - Extract human-readable strings from binary files.
+- [ghidra](https://ghidra-sre.org/) - Free software reverse engineering (SRE) framework developed by the National Security Agency (NSA) of the United States
 #### Exploitation Frameworks and Tools
 - [exploitdb](https://www.exploit-db.com) - Public exploit repository.
 - [impacket-scripts](https://github.com/SecureAuthCorp/impacket) - Tools for network protocols and exploitation.
@@ -234,9 +237,9 @@ def main():
         "Reconnaissance": ["nmap", "nikto", "metasploit-framework", "burpsuite", "zaproxy", "theharvester", "recon-ng", "amass", "whatweb"],
         "OSINT": ["sherlock", "metagoofil", "shodan", "dnsrecon", "dnsenum"],
         "Web Application Security": ["sqlmap", "xsstrike", "wapiti", "commix"],
-        "Password Cracking": ["john", "hashcat", "hydra"],
+        "Password Cracking": ["john", "hashcat", "hydra", "pdfcrack", "steghide"],
         "Network Analysis": ["wireshark", "tcpdump", "ettercap", "aircrack-ng"],
-        "Binary and Malware Analysis": ["radare2", "binwalk", "strings", "yara"],
+        "Binary and Malware Analysis": ["radare2", "binwalk", "strings", "yara", "ghidra"],
         "Exploitation": ["exploitdb", "impacket-scripts", "empire", "mimikatz", "bloodhound"],
         "Post-Exploitation": ["volatility", "autopsy"],
         "Social Engineering": ["set", "beef-xss"],

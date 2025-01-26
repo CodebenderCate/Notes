@@ -2,7 +2,7 @@
 <img src="https://github.com/CodebenderCate/codebendercate/blob/main/Images/linux.png" width="400 height="100"/>
 </div>
 
-# My Notes for Linux+ (2024)
+# My Notes for Linux+ (2025)
 
 This guide simplifies the objectives for the CompTIA Linux+ XK0-006 exam, breaking down each domain into key topics, explanations, and examples. but it is based on Linux+ XK1-005. Please refer to the new [Draft Objectives](https://comptiacdn.azureedge.net/webcontent/docs/default-source/exam-objectives/under-development/draft-linux-xk0-006-exam-objectives-(1-0).pdf). I will expand, clarify, correct, and update this as I go
 

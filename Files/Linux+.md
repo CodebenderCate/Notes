@@ -235,6 +235,22 @@ This guide simplifies the objectives for the CompTIA Linux+ XK0-006 exam, breaki
   - Add a repository: `flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo`
   - Install a package: `flatpak install flathub <package-name>`
 
+#### Managing Shared Libraries
+- **Explanation**: Shared libraries are files used by multiple programs to share code, reducing memory usage and redundancy.
+- **Commands and Examples**:
+  - List installed shared libraries: `ldconfig -p`
+  - View shared library dependencies of a binary:
+    ```bash
+    ldd /path/to/binary
+    ```
+  - Update library cache:
+    ```bash
+    sudo ldconfig
+    ```
+- **Relevance**:
+  - Resolving missing library errors.
+  - Managing custom libraries for specific applications.
+
 ---
 
 ### 1.3 Given a Scenario, Manage Storage in a Linux System
@@ -513,6 +529,29 @@ This guide simplifies the objectives for the CompTIA Linux+ XK0-006 exam, breaki
   systemctl restart nginx
   systemctl status nginx
 
+#### Scheduling Jobs with `cron` and `at`
+- **Explanation**: Automating tasks using `cron` (recurring) and `at` (one-time) scheduling tools.
+- **Commands and Examples**:
+  - Add a recurring job to the system's crontab:
+    ```bash
+    crontab -e
+    ```
+    Example entry:
+    ```bash
+    0 2 * * * /path/to/backup_script.sh
+    ```
+  - View user-specific `cron` jobs:
+    ```bash
+    crontab -l
+    ```
+  - Schedule a one-time job with `at`:
+    ```bash
+    echo "/path/to/script.sh" | at 14:00
+    ```
+- **Relevance**:
+  - Automating routine administrative tasks.
+  - Ensuring critical scripts run on schedule.
+
 ---
 
 ### 2.6 Manage Applications in a Container
@@ -578,6 +617,26 @@ This guide simplifies the objectives for the CompTIA Linux+ XK0-006 exam, breaki
 - **Online Labs/Resources**:
   - [TryHackMe: Linux Privilege Escalation](https://tryhackme.com/room/linuxprivilegeescalation)
 
+#### Password Policies
+- **Explanation**: Enforcing password policies enhances system security by preventing weak or expired passwords.
+- **Commands and Examples**:
+  - Set system-wide password policies:
+    Edit `/etc/login.defs`:
+    ```bash
+    PASS_MAX_DAYS 90
+    PASS_MIN_DAYS 7
+    PASS_WARN_AGE 14
+    ```
+  - Enforce password complexity:
+    Edit `/etc/security/pwquality.conf`:
+    ```bash
+    minlen = 12
+    minclass = 4
+    ```
+- **Relevance**:
+  - Comply with security standards.
+  - Reduce risk of unauthorized access.
+
 #### Certificates and PKI
 - **Explanation**: Certificates are used to secure communication and verify authenticity in Linux systems.
 - **Tools**:
@@ -593,6 +652,30 @@ This guide simplifies the objectives for the CompTIA Linux+ XK0-006 exam, breaki
     openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
       -keyout mysite.key -out mysite.crt
     ```
+    
+#### Multi-Factor Authentication (MFA)
+- **Explanation**: MFA adds an additional layer of security by requiring multiple authentication factors.
+- **Commands and Examples**:
+  - Install Google Authenticator:
+    ```bash
+    sudo apt install libpam-google-authenticator
+    ```
+  - Configure PAM for MFA:
+    Add the following to `/etc/pam.d/sshd`:
+    ```bash
+    auth required pam_google_authenticator.so
+    ```
+  - Enable challenge-response authentication in `/etc/ssh/sshd_config`:
+    ```bash
+    ChallengeResponseAuthentication yes
+    ```
+  - Restart SSH:
+    ```bash
+    sudo systemctl restart sshd
+    ```
+- **Relevance**:
+  - Enhances login security.
+  - Mitigates the risk of compromised credentials.
 
 #### Pluggable Authentication Modules (PAM)
 - **Explanation**: PAM is a framework that integrates multiple authentication methods.
@@ -820,6 +903,8 @@ This guide simplifies the objectives for the CompTIA Linux+ XK0-006 exam, breaki
   - Logrotate configuration: `/etc/logrotate.conf`
   - Logs: `/var/log/audit/`
 
+---
+
 ### 3.6 Password Policies and PAM Modules
 
 #### Password Management
@@ -960,6 +1045,8 @@ This guide simplifies the objectives for the CompTIA Linux+ XK0-006 exam, breaki
   - Track code changes for collaboration and rollback.
   - Use Git in CI/CD pipelines for automated deployments.
 
+---
+
 ### 4.3 Version Control Systems
 
 #### Git Basics
@@ -996,6 +1083,26 @@ This guide simplifies the objectives for the CompTIA Linux+ XK0-006 exam, breaki
 - **Key Locations**:
   - System statistics: `/proc/stat`
   - Memory info: `/proc/meminfo`
+
+#### Diagnosing Boot Failures
+- **Explanation**: Identifying and resolving issues preventing the system from booting correctly.
+- **Commands and Examples**:
+  - View boot logs:
+    ```bash
+    journalctl -b -1
+    ```
+  - Access recovery mode (grub menu).
+  - Check GRUB configuration:
+    ```bash
+    cat /boot/grub/grub.cfg
+    ```
+  - Rebuild GRUB:
+    ```bash
+    sudo grub-mkconfig -o /boot/grub/grub.cfg
+    ```
+- **Relevance**:
+  - Restoring system functionality after a boot failure.
+  - Troubleshooting kernel or hardware-related issues.
 
 #### Glances
 - **Explanation**: Glances is a comprehensive monitoring tool for CPU, memory, disk, and network usage.

@@ -14,7 +14,7 @@ This guide simplifies the objectives for the CompTIA Linux+ XK0-006 exam, breaki
 
 #### Boot Process
 - **Explanation**: The Linux boot process is a sequence of events that occur from powering on the machine to loading the operating system kernel and initializing system services. It includes the following stages:
-   -  **BIOS/UEFI Initialization**:
+   - **BIOS/UEFI Initialization**:
      - Executes POST (Power-On Self-Test).
      - Hands control to the bootloader.
    - **Bootloader (GRUB)**:
@@ -39,6 +39,23 @@ This guide simplifies the objectives for the CompTIA Linux+ XK0-006 exam, breaki
   - GRUB configuration: `/boot/grub/grub.cfg`, `/etc/default/grub`
   - PXE boot: `/tftpboot/`
   - Kernel logs: `/var/log/kern.log`
+
+#### UEFI Secure Boot
+- **Explanation**: UEFI Secure Boot ensures that only trusted software runs during the boot process.
+- **Key Features**:
+  - Prevents the execution of unsigned or tampered bootloaders.
+  - Uses digital certificates and signatures to verify authenticity.
+- **Commands and Examples**:
+  - Check Secure Boot status:
+    ```bash
+    mokutil --sb-state
+    ```
+  - Disable Secure Boot (if necessary):
+    - Access UEFI firmware settings during system startup.
+- **Relevance**:
+  - Ensures secure system initialization.
+  - Protects against bootkits and rootkits.
+
 
 #### System Monitoring Tools
 - **Explanation**: Monitoring tools provide insights into system performance and help identify issues.
@@ -207,6 +224,16 @@ This guide simplifies the objectives for the CompTIA Linux+ XK0-006 exam, breaki
   - View module details: `modinfo <module>`
 - **Key Locations**:
   - Module storage: `/lib/modules/<kernel_version>/`
+
+#### Modern Package Formats
+- **Snap**:
+  - Install Snap: `sudo apt install snapd`
+  - Install a package: `sudo snap install <package-name>`
+  - List installed snaps: `snap list`
+- **Flatpak**:
+  - Install Flatpak: `sudo apt install flatpak`
+  - Add a repository: `flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo`
+  - Install a package: `flatpak install flathub <package-name>`
 
 ---
 
@@ -511,6 +538,24 @@ This guide simplifies the objectives for the CompTIA Linux+ XK0-006 exam, breaki
   - Docker configurations: `/var/lib/docker/`
   - Podman configurations: `/etc/containers/`
 
+#### Podman and Kubernetes
+- **Podman**:
+  - Pull an image: `podman pull nginx`
+  - Run a container: `podman run -d nginx`
+  - Inspect a container:
+    ```bash
+    podman inspect <container-id>
+    ```
+- **Kubernetes**:
+  - Deploy an application:
+    ```bash
+    kubectl create deployment nginx --image=nginx
+    ```
+  - View pods:
+    ```bash
+    kubectl get pods
+    ```
+
 ---
 
 ## 3.0 Security
@@ -603,6 +648,21 @@ This guide simplifies the objectives for the CompTIA Linux+ XK0-006 exam, breaki
   - User settings: `/etc/shadow`
   - Default policies: `/etc/login.defs`
 
+#### AppArmor
+- **Explanation**: AppArmor is a Linux security module that enforces access control using profiles.
+- **Commands and Examples**:
+  - View AppArmor status:
+    ```bash
+    aa-status
+    ```
+  - Enable/disable a profile:
+    ```bash
+    sudo aa-enforce /etc/apparmor.d/<profile>
+    sudo aa-disable /etc/apparmor.d/<profile>
+    ```
+- **Relevance**:
+  - Provides an alternative to SELinux for managing access control.
+
 ---
 
 ### 3.2 Configure and Implement Firewalls
@@ -619,6 +679,22 @@ This guide simplifies the objectives for the CompTIA Linux+ XK0-006 exam, breaki
   - Allow traffic: `ufw allow ssh`
 - **Key Locations**:
   - Firewall configuration: `/etc/iptables/`, `/etc/nftables.conf`
+
+#### nftables
+- **Explanation**: nftables is the modern replacement for `iptables`.
+- **Commands and Examples**:
+  - List rules:
+    ```bash
+    nft list ruleset
+    ```
+  - Add a rule:
+    ```bash
+    nft add rule ip filter input tcp dport 22 accept
+    ```
+  - Save rules:
+    ```bash
+    nft list ruleset > /etc/nftables.conf
+    ```
 
 ---
 
@@ -811,6 +887,23 @@ This guide simplifies the objectives for the CompTIA Linux+ XK0-006 exam, breaki
   - Inventory files: `inventory/`
   - Role directories: `roles/`
 
+#### Configuration Management Tools
+- **Ansible**:
+  - Run a playbook:
+    ```bash
+    ansible-playbook site.yml -i inventory
+    ```
+- **Puppet**:
+  - Apply a manifest:
+    ```bash
+    puppet apply manifest.pp
+    ```
+- **Chef**:
+  - Create a cookbook:
+    ```bash
+    chef generate cookbook <name>
+    ```
+
 ---
 
 ### 4.2 Advanced Shell Scripting
@@ -867,6 +960,23 @@ This guide simplifies the objectives for the CompTIA Linux+ XK0-006 exam, breaki
   - Track code changes for collaboration and rollback.
   - Use Git in CI/CD pipelines for automated deployments.
 
+### 4.3 Version Control Systems
+
+#### Git Basics
+- **Commands**:
+  - Clone a repository:
+    ```bash
+    git clone <repo-url>
+    ```
+  - Create a branch:
+    ```bash
+    git branch <branch-name>
+    ```
+  - Commit changes:
+    ```bash
+    git commit -m "message"
+    ```
+
 ---
 
 ## 5.0 Troubleshooting
@@ -886,6 +996,15 @@ This guide simplifies the objectives for the CompTIA Linux+ XK0-006 exam, breaki
 - **Key Locations**:
   - System statistics: `/proc/stat`
   - Memory info: `/proc/meminfo`
+
+#### Glances
+- **Explanation**: Glances is a comprehensive monitoring tool for CPU, memory, disk, and network usage.
+- **Commands and Examples**:
+  - Install Glances: `sudo apt install glances`
+  - Start Glances:
+    ```bash
+    glances
+    ```
 
 #### Logs
 - **Explanation**: Logs provide detailed records of system events, application errors, and user activities.
@@ -969,6 +1088,18 @@ This guide simplifies the objectives for the CompTIA Linux+ XK0-006 exam, breaki
 - **Key Locations**:
   - Network interfaces: `/etc/network/interfaces` (Debian) or `/etc/sysconfig/network-scripts/` (Red Hat)
   - DNS settings: `/etc/resolv.conf`
+
+#### Advanced Tools
+- **mtr**:
+  - Run an mtr trace:
+    ```bash
+    mtr <hostname>
+    ```
+- **ss**:
+  - View open sockets:
+    ```bash
+    ss -tuln
+    ```
 
 #### Advanced Networking Tools
 - **Explanation**: Tools like `tcpdump` and `nmap` are used for in-depth network diagnostics.

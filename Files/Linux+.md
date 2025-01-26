@@ -2052,7 +2052,6 @@ This guide simplifies the objectives for the CompTIA Linux+ XK0-006 exam, breaki
 - [Learn The Command Line](https://www.codecademy.com/learn/learn-the-command-line)
 ### Cybrary
 - [CompTIA Linux+ XKO-005](https://www.cybrary.it/course/comptia-linux-plus)
-- [Cryptography](https://www.cybrary.it/course/cryptography)
 ### LinkedIn Learning
 - [Linux](https://www.linkedin.com/learning/search?keywords=linux&u=0)
 - [Applied AI for IT Operations (AIOps)](https://www.linkedin.com/learning/applied-ai-for-it-operations-aiops/artificial-intelligence-and-its-many-uses?u=0)

@@ -2027,10 +2027,10 @@ This guide simplifies the objectives for the CompTIA Linux+ XK0-006 exam, breaki
 - [Udemy Linux+ Certification Courses](https://www.udemy.com/course/comptia-linux)
 - [ACI Learning Linux Courses](https://www.acilearning.com/catalog/linux/)
 - [TestOut Linux+ Labs](https://testoutce.com/pages/free-comptia-linuxplus-labs)
-- [The Linux Command Line by William Shotts](http://linuxcommand.org/tlcl.php)(free PDF)
+- [The Linux Command Line by William Shotts](http://linuxcommand.org/tlcl.php) (free PDF)
 - [TLDP (The Linux Documentation Project)](http://www.tldp.org/)
 - [Linux Journey](https://linuxjourney.com/)
-- [OverTheWire Wargames](https://overthewire.org/wargames/bandit/)(Bandit for Linux basics)
+- [OverTheWire Wargames](https://overthewire.org/wargames/bandit/) (Bandit for Linux basics)
 - [Cisco Netacad](https://www.netacad.com/catalogs/learn?language=en-us&search=linux)
 ### HackTheBox
 - [Linux Privilege Escalation](https://academy.hackthebox.com/course/preview/linux-privilege-escalation)

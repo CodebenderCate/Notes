@@ -21,7 +21,7 @@
 ---
 ## **Categorized Tool Installation**: Installs cybersecurity tools grouped by purpose
 #### Reconnaissance
-- [nmap](https://nmap.org) – Host discovery and port scanning.
+- [nmap](https://nmap.org) - Host discovery and port scanning.
 - [nikto](https://cirt.net/Nikto2) – Web server vulnerability scanner.
 - [metasploit-framework](https://www.metasploit.com) – Penetration testing framework.
 - [burpsuite](https://portswigger.net/burp) – Web proxy and vulnerability scanner.

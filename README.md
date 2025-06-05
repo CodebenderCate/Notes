@@ -8,5 +8,6 @@ I'm trying to keep notes of things I'm learning throughout my degree, including 
 - [PenTest+](https://github.com/CodebenderCate/Notes/blob/main/Files/PenTest%2B.md)
 - [PenTesting Cheat Sheet](https://github.com/CodebenderCate/Notes/blob/main/Files/PenTesting%20Cheat%20Sheet.md)
 - [CYSA+](https://github.com/CodebenderCate/Notes/blob/main/Files/CYSA%2B.md)
+- [CISSP Cheat Sheet](https://github.com/CodebenderCate/Notes/blob/main/Files/CISSP%20Cheat%20Sheet%20-%208%20Domains.pdf)
 - [Tools Installer](https://github.com/CodebenderCate/Notes/blob/main/Files/tools.py.md)
 - [Tools Installer - 2025 Update](https://github.com/CodebenderCate/Notes/blob/main/Files/tools2.py.md) (*adds Mistral, removes changes to LightDM settings*)

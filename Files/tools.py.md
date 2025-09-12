@@ -114,7 +114,9 @@ def run_command(command, exit_on_fail=True):
 # Function to verify package integrity using debsums
 def verify_packages_with_debsums():
     print("Verifying installed packages with debsums...")
-    run_command("apt install -y debsums")
+    run_command("gpg --keyserver keyserver.ubuntu.com --recv-keys 827C8569F2518CC677FECA1AED65462EC8D5E4C5", exit_on_fail=False)
+    run_command("gpg --export 827C8569F2518CC677FECA1AED65462EC8D5E4C5 | tee /etc/apt/trusted.gpg.d/kali.gpg > /dev/null", exit_on_fail=False)
+    run_command("apt-get install -y debsums")
     result = subprocess.run("debsums -c", shell=True, text=True, capture_output=True)
     if result.returncode == 0:
         print("[INFO] All packages passed verification with debsums.")
@@ -135,7 +137,7 @@ def clean_sources_list():
                     print(f"[INFO] Removing blacklisted source: {line.strip()}")
                 else:
                     new_f.write(line)
-        run_command("apt-get update", exit_on_fail=False)
+        run_command("apt-get update --fix-missing", exit_on_fail=False)
     except Exception as e:
         logging.error(f"[ERROR] Failed to clean sources list: {e}")
         exit(1)
@@ -166,7 +168,7 @@ def install_packages(package_list):
     for package in package_list:
         try:
             print(f"Installing: {package}")
-            run_command(f"apt install -y {package}", exit_on_fail=False)
+            run_command(f"apt-get install -y {package}", exit_on_fail=False)
         except Exception as e:
             logging.error(f"[WARNING] Failed to install {package}: {e}")
             failed_installs.append(package)
@@ -181,14 +183,14 @@ def install_packages(package_list):
 # Function to clean and autoremove unnecessary packages and files
 def clean_up_system():
     print("Cleaning up unnecessary packages and files...")
-    run_command("apt autoremove -y")
-    run_command("apt clean")
+    run_command("apt-get autoremove -y")
+    run_command("apt-get clean")
     print("[INFO] Cleanup completed.")
 
 # Update and upgrade system
 def update_system():
     print("Updating and upgrading the system...")
-    run_command("apt update && apt upgrade -y")
+    run_command("apt-get update --allow-releaseinfo-change && apt-get upgrade --fix-missing -y")
 
 # Configure sysctl settings
 def configure_sysctl():

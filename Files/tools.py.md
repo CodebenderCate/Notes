@@ -106,16 +106,16 @@ def run_command(command, exit_on_fail=True):
     try:
         print(f"Running: {command}")
         subprocess.run(command, shell=True, check=True)
+        return True
     except subprocess.CalledProcessError as e:
         logging.error(f"[ERROR] Command failed: {command}\n{e}")
         if exit_on_fail:
             exit(1)
+        return False
 
 # Function to verify package integrity using debsums
 def verify_packages_with_debsums():
     print("Verifying installed packages with debsums...")
-    run_command("gpg --keyserver keyserver.ubuntu.com --recv-keys 827C8569F2518CC677FECA1AED65462EC8D5E4C5", exit_on_fail=False)
-    run_command("gpg --export 827C8569F2518CC677FECA1AED65462EC8D5E4C5 | tee /etc/apt/trusted.gpg.d/kali.gpg > /dev/null", exit_on_fail=False)
     run_command("apt-get install -y debsums")
     result = subprocess.run("debsums -c", shell=True, text=True, capture_output=True)
     if result.returncode == 0:
@@ -140,7 +140,7 @@ def clean_sources_list():
         run_command("apt-get update --fix-missing", exit_on_fail=False)
     except Exception as e:
         logging.error(f"[ERROR] Failed to clean sources list: {e}")
-        exit(1)
+        return
 
 # Function to verify file hash
 def verify_file_hash(file_path, expected_hash):
@@ -168,7 +168,8 @@ def install_packages(package_list):
     for package in package_list:
         try:
             print(f"Installing: {package}")
-            run_command(f"apt-get install -y {package}", exit_on_fail=False)
+            if not run_command(f"apt-get install -y {package}", exit_on_fail=False):
+    failed_installs.append(package)
         except Exception as e:
             logging.error(f"[WARNING] Failed to install {package}: {e}")
             failed_installs.append(package)
@@ -188,6 +189,9 @@ def clean_up_system():
     print("[INFO] Cleanup completed.")
 
 # Update and upgrade system
+def refresh_kali_keys():
+    print("Refreshing Kali archive keys...")
+    run_command("apt-get install --reinstall -y kali-archive-keyring", exit_on_fail=False)
 def update_system():
     print("Updating and upgrading the system...")
     run_command("apt-get update --allow-releaseinfo-change && apt-get upgrade --fix-missing -y")
@@ -206,8 +210,12 @@ kernel.dmesg_restrict = 1
 kernel.kptr_restrict = 2
 """
     try:
-        with open("/etc/sysctl.conf", "a") as sysctl_file:
-            sysctl_file.write(sysctl_config)
+        marker = "# Security-focused sysctl settings"
+with open("/etc/sysctl.conf", "r+") as sysctl_file:
+    content = sysctl_file.read()
+    if marker not in content:
+        sysctl_file.write(sysctl_config)
+
         run_command("sysctl -p")
     except Exception as e:
         logging.error(f"[ERROR] Failed to configure sysctl: {e}")
@@ -215,12 +223,17 @@ kernel.kptr_restrict = 2
 # Set up a cron job for Lynis
 def setup_cron_job():
     try:
-        run_command('echo "0 3 * * * /usr/sbin/lynis audit system" | tee -a /etc/crontab')
+        cron_entry = "0 3 * * * /usr/sbin/lynis audit system"
+with open("/etc/crontab", "r+") as f:
+    content = f.read()
+    if cron_entry not in content:
+        f.write(cron_entry + "\n")
     except Exception as e:
         logging.error(f"[ERROR] Failed to set up cron job: {e}")
 
 # Main function to orchestrate tasks
 def main():
+    refresh_kali_keys()
     update_system()
     clean_sources_list()
 
@@ -254,7 +267,7 @@ def main():
     # Example file hash verification
     files_to_verify = {
         "/usr/bin/nmap": "EXPECTED_HASH_1",
-        "/usr/bin/sqlmap": "EXPECTED_HASH_2"
+        "/usr/share/sqlmap/sqlmap.py": "EXPECTED_HASH_2"
     }
 
     for file_path, expected_hash in files_to_verify.items():

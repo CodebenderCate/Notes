@@ -188,7 +188,7 @@ def clean_up_system():
 # Update and upgrade system
 def refresh_kali_keys():
     print("Refreshing Kali archive keys...")
-    run_command("apt-get install --reinstall -y kali-archive-keyring", exit_on_fail=False)
+    run_command("wget -q -O - https://archive.kali.org/archive-key.asc | gpg --dearmor > /etc/apt/trusted.gpg.d/kali-archive-keyring.gpg", exit_on_fail=False)
 def update_system():
     print("Updating and upgrading the system...")
     run_command("apt-get update --allow-releaseinfo-change && apt-get upgrade --fix-missing -y")

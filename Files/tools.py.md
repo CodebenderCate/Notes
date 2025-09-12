@@ -1,5 +1,3 @@
-
-
 ## **Features**
 ### 1. **System Preparation**
 - Updates and upgrades the system.

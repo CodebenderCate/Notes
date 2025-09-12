@@ -166,7 +166,7 @@ def install_packages(package_list):
         try:
             print(f"Installing: {package}")
             if not run_command(f"apt-get install -y {package}", exit_on_fail=False):
-    failed_installs.append(package)
+                failed_installs.append(package)
         except Exception as e:
             logging.error(f"[WARNING] Failed to install {package}: {e}")
             failed_installs.append(package)
@@ -212,19 +212,18 @@ kernel.kptr_restrict = 2
           content = sysctl_file.read()
           if marker not in content:
              sysctl_file.write(sysctl_config)
-
         run_command("sysctl -p")
-        except Exception as e:
+    except Exception as e:
         logging.error(f"[ERROR] Failed to configure sysctl: {e}")
 
 # Set up a cron job for Lynis
 def setup_cron_job():
     try:
-    cron_entry = "0 3 * * * /usr/sbin/lynis audit system"
-    with open("/etc/crontab", "r+") as f:
-      content = f.read()
-      if cron_entry not in content:
-        f.write(cron_entry + "\n")
+        cron_entry = "0 3 * * * /usr/sbin/lynis audit system"
+        with open("/etc/crontab", "r+") as f:
+            content = f.read()
+            if cron_entry not in content:
+                f.write(cron_entry + "\n")
     except Exception as e:
         logging.error(f"[ERROR] Failed to set up cron job: {e}")
 

@@ -73,7 +73,6 @@
 #### Wireless and IoT Security
 - [wifite](https://github.com/derv82/wifite2) – Automated WiFi attacks.
 - [reaver](https://github.com/t6x/reaver-wps-fork-t6x) – WPS brute-force.
-- [aircrack-ng](https://www.aircrack-ng.org) – Wireless network auditing.
 #### Utility and Maintenance Tools
 - [postman](https://www.postman.com) – API testing GUI.
 - [netcat](https://nc110.sourceforge.io) – Swiss army knife of networking.
@@ -211,22 +210,22 @@ kernel.kptr_restrict = 2
 """
     try:
         marker = "# Security-focused sysctl settings"
-with open("/etc/sysctl.conf", "r+") as sysctl_file:
-    content = sysctl_file.read()
-    if marker not in content:
-        sysctl_file.write(sysctl_config)
+        with open("/etc/sysctl.conf", "r+") as sysctl_file:
+          content = sysctl_file.read()
+          if marker not in content:
+             sysctl_file.write(sysctl_config)
 
         run_command("sysctl -p")
-    except Exception as e:
+        except Exception as e:
         logging.error(f"[ERROR] Failed to configure sysctl: {e}")
 
 # Set up a cron job for Lynis
 def setup_cron_job():
     try:
-        cron_entry = "0 3 * * * /usr/sbin/lynis audit system"
-with open("/etc/crontab", "r+") as f:
-    content = f.read()
-    if cron_entry not in content:
+    cron_entry = "0 3 * * * /usr/sbin/lynis audit system"
+    with open("/etc/crontab", "r+") as f:
+      content = f.read()
+      if cron_entry not in content:
         f.write(cron_entry + "\n")
     except Exception as e:
         logging.error(f"[ERROR] Failed to set up cron job: {e}")

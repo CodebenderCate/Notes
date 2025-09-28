@@ -1,4 +1,4 @@
-Backup from: https://github.com/johnnymeintel/d487-secure-software-design
+Backup from: [https://github.com/johnnymeintel/d487-secure-software-design](https://github.com/johnnymeintel/WGU-D487-Secure-Software-Design)
 
 # D487 Secure Software Design - Study Notes
 

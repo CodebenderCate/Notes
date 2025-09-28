@@ -1,3 +1,5 @@
+Backup from: https://github.com/johnnymeintel/d487-secure-software-design
+
 # D487 Secure Software Design - Study Notes
 
 **Status: ✅ PASSED**

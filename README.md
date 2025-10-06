@@ -10,4 +10,5 @@ I'm trying to keep notes of things I'm learning throughout my degree, including 
 - [CYSA+](https://github.com/CodebenderCate/Notes/blob/main/Files/CYSA%2B.md)
 - [CISSP Cheat Sheet](https://github.com/CodebenderCate/Notes/blob/main/Files/CISSP%20Cheat%20Sheet%20-%208%20Domains.pdf)
 - [Tools Installer - 2025 Update](https://github.com/CodebenderCate/Notes/blob/main/Files/tools.py.md)
+- [OS Secure Only - Without Tools]()
 - [JohnnyMeintel D487 Backup](https://github.com/CodebenderCate/Notes/tree/main/Files/D487%20Backup)

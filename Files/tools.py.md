@@ -1,5 +1,4 @@
 ## **Features**
-### 1. **Automated Tool Setup**
 - Installs categorized cybersecurity tools:
   - Recon, OSINT, Web security, Post-exploitation, Reverse engineering, etc.
 - Logs errors and provides a summary of failed installs.

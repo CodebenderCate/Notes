@@ -1,205 +1,124 @@
 # A draft update for my integrity script
-## What it's supposed to do
 
 ---
 
-## 1. Execution Safety & Logging
+## Comparison
 
-### Root check
-
-* **What:** Exits if not run as root.
-* **Why:** Every action (APT, sysctl, firewall, permissions) requires root. Prevents partial or misleading execution.
-
-### Logging to `/var/log/system_hardening.log`
-
-* **What:** Logs every command execution and all errors.
-* **Why:** Provides auditability and troubleshooting without flooding stdout. Errors persist across reboots.
+| Area             | Original Script           | Fixed Script                      |
+| ---------------- | ------------------------- | --------------------------------- |
+| Target OS        | Implicit Kali/Debian      | Explicit **Kali personal laptop** |
+| Threat model     | Mixed (baseline + hashes) | **Supply-chain focused**          |
+| Execution safety | Partial                   | **Fail-fast, deterministic**      |
+| Idempotence      | No                        | **Yes**                           |
 
 ---
 
-## 2. APT Supply-Chain Hardening (Prevention)
+## APT & Package Security
 
-### `enable_apt_security()`
-
-* **What:**
-
-  * Rejects unauthenticated packages
-  * Rejects insecure repositories
-  * Rejects downgrades to insecure repos
-  * Pins to `kali-rolling`
-* **Why:**
-  This prevents malicious packages **before installation** by enforcing:
-
-  * Mandatory GPG signatures
-  * No HTTP or unsigned repos
-  * No downgrade attacks to weaker mirrors
-    This is the strongest protection layer in the script.
+| Feature                  | Original             | Fixed                        |
+| ------------------------ | -------------------- | ---------------------------- |
+| Reject unsigned packages | ❌ Not enforced       | ✅ Enforced                   |
+| Block insecure repos     | ❌ Partial            | ✅ Enforced                   |
+| HTTPS-only repos         | ❌ No                 | ✅ Yes                        |
+| Downgrade protection     | ❌ No                 | ✅ Yes                        |
+| Kali pinning             | ❌ No                 | ✅ `kali-rolling`             |
+| Key handling             | ❌ Unsafe pipe to gpg | ✅ Correct file-based dearmor |
 
 ---
 
-## 3. Repository Hygiene
+## Repository Handling
 
-### `clean_sources_list()`
-
-* **What:** Removes `http://` repositories from `sources.list` and backs it up.
-* **Why:**
-  HTTP allows MITM attacks. Kali official repos are HTTPS; anything else is unnecessary risk.
-
----
-
-## 4. Trust Anchor Verification
-
-### `refresh_kali_keys()`
-
-* **What:**
-
-  * Downloads the official Kali archive signing key
-  * Converts it to a binary GPG key
-  * Installs it into APT’s trusted keyring
-* **Why:**
-  Ensures that **only official Kali-signed packages** are trusted. Protects against:
-
-  * Mirror compromise
-  * Key poisoning
-  * MITM during package downloads
+| Aspect                | Original       | Fixed                   |
+| --------------------- | -------------- | ----------------------- |
+| Backup sources.list   | ✅ Yes          | ✅ Yes                   |
+| HTTP removal          | ❌ No           | ✅ Yes                   |
+| Blacklist placeholder | ❌ Example only | ✅ Real security control |
 
 ---
 
-## 5. System Update (Correct Order)
+## Sysctl Hardening
 
-### `update_system()`
-
-* **What:** Updates package lists and fully upgrades the system.
-* **Why:**
-  Ensures the system starts from a **known-good, fully patched state** before hardening.
-
----
-
-## 6. Essential Tooling
-
-### `install_essential_tools()`
-
-* **What:** Installs wget, curl, gnupg, HTTPS transport, certificates.
-* **Why:**
-  These are prerequisites for secure package retrieval and key verification.
+| Aspect                       | Original | Fixed         |
+| ---------------------------- | -------- | ------------- |
+| Writes to `/etc/sysctl.conf` | ✅ Yes    | ❌ No          |
+| Uses drop-in file            | ❌ No     | ✅ Yes         |
+| Kali-safe tuning             | ❌ Risky  | ✅ Safe        |
+| IPv6 handling                | Partial  | Minimal, safe |
 
 ---
 
-## 7. Kernel & Network Hardening (Non-Breaking)
+## SSH Hardening
 
-### `configure_sysctl()`
-
-* **What:** Enables:
-
-  * ASLR
-  * Kernel pointer & dmesg restrictions
-  * Symlink/hardlink protections
-  * Disables SUID core dumps
-  * Enables TCP SYN cookies
-* **Why:**
-  Reduces kernel info leaks and basic exploitation vectors **without breaking Kali tools**.
+| Aspect               | Original | Fixed |
+| -------------------- | -------- | ----- |
+| Disable root login   | ✅ Yes    | ✅ Yes |
+| Validate sshd config | ❌ No     | ✅ Yes |
+| PATH-safe sshd call  | ❌ No     | ✅ Yes |
 
 ---
 
-## 8. Security Services Installation
+## Firewall (UFW)
 
-### `install_security_tools()`
-
-Installs and enables:
-
-#### Fail2Ban
-
-* **Why:** Blocks SSH brute-force attacks.
-
-#### UFW
-
-* **Why:** Simple firewall enforcing:
-
-  * Default deny inbound
-  * Allow outbound
-  * SSH allowed explicitly
-
-#### Auditd
-
-* **Why:** Enables kernel-level activity logging for post-incident review.
-
-#### AppArmor (light)
-
-* **Why:** Enables kernel mediation framework **without enforcing profiles**, avoiding tool breakage.
-
-#### Unattended upgrades
-
-* **Why:** Keeps security updates applied automatically.
-
-#### Lynis & rkhunter
-
-* **Why:** Periodic security auditing and rootkit detection.
+| Aspect               | Original  | Fixed       |
+| -------------------- | --------- | ----------- |
+| Default deny inbound | ✅ Yes     | ✅ Yes       |
+| Explicit SSH allow   | Partial   | Explicit    |
+| IPv6 behavior        | Undefined | Predictable |
 
 ---
 
-## 9. SSH Hardening (Minimal & Safe)
+## Integrity & Verification
 
-* **What:** Disables root SSH login and validates config before restart.
-* **Why:**
-  Prevents remote root access while preserving SSH usability.
-
----
-
-## 10. Package Integrity Verification (Detection)
-
-### `verify_package_integrity()`
-
-* **What:** Runs `debsums -as` and logs modified files.
-* **Why:**
-  Detects **post-install tampering** of packaged files.
-
-  * Uses MD5 only for integrity comparison
-  * Trust comes from GPG signatures, not hashes
-
-This confirms nothing malicious altered installed packages.
+| Aspect               | Original              | Fixed                           |
+| -------------------- | --------------------- | ------------------------------- |
+| debsums installed    | ✅ Yes                 | ✅ Yes                           |
+| debsums purpose      | Mixed                 | **Post-install detection only** |
+| SHA256 baselines     | ❌ Broken placeholders | ❌ Removed                       |
+| False integrity risk | High                  | Low                             |
 
 ---
 
-## 11. Automated Auditing
+## Cron Jobs
 
-### `setup_cron_jobs()`
-
-* **What:** Adds daily Lynis and rkhunter jobs via `/etc/cron.d/`.
-* **Why:**
-  Continuous, automated auditing without manual effort or cron corruption risk.
-
----
-
-## 12. Permission Enforcement
-
-### `set_permissions()`
-
-* **What:** Enforces correct permissions on `/etc/{shadow,gshadow,passwd,group}`.
-* **Why:**
-  Prevents credential disclosure and enforces UNIX security expectations.
+| Aspect                   | Original | Fixed         |
+| ------------------------ | -------- | ------------- |
+| Writes to `/etc/crontab` | ❌ Unsafe | ❌ No          |
+| Uses `/etc/cron.d/`      | ❌ No     | ✅ Yes         |
+| Duplicate prevention     | Partial  | Deterministic |
 
 ---
 
-## 13. Cleanup
+## Logging
 
-### `clean_up_system()`
-
-* **What:** Removes unused packages and clears APT caches.
-* **Why:**
-  Reduces attack surface and frees disk space.
+| Aspect        | Original      | Fixed                           |
+| ------------- | ------------- | ------------------------------- |
+| Logs commands | ❌ No          | ✅ Yes                           |
+| Logs errors   | ✅ Yes         | ✅ Yes                           |
+| Log location  | Relative path | `/var/log/system_hardening.log` |
+| Persistence   | ❌ No          | ✅ Yes                           |
 
 ---
 
-## 14. Final Outcome
+## Services & Hardening Scope
 
-After execution, the system:
+| Component           | Original | Fixed            |
+| ------------------- | -------- | ---------------- |
+| Fail2Ban            | ✅        | ✅                |
+| Auditd              | ✅        | ✅                |
+| AppArmor            | ❌        | ✅ (enabled only) |
+| Unattended upgrades | ✅        | ✅                |
+| Tool breakage risk  | Medium   | **Low**          |
 
-* Only installs **signed, HTTPS-delivered Kali packages**
-* Trusts only **official Kali archive keys**
-* Detects post-install tampering
-* Has basic firewalling, intrusion protection, auditing, and kernel hardening
-* Runs continuous security audits automatically
-* Avoids brittle hash baselines and enterprise lockdowns
+---
+
+## Execution Safety
+
+| Aspect               | Original | Fixed   |
+| -------------------- | -------- | ------- |
+| Root enforcement     | ✅        | ✅       |
+| Partial failure risk | High     | **Low** |
+| Silent errors        | Yes      | No      |
+| Re-run safe          | ❌        | ✅       |
 
 ---
 

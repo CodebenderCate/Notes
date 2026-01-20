@@ -131,13 +131,18 @@ import logging
 import shutil
 from pathlib import Path
 
-# === CONFIG ===
+# ================= CONFIG =================
 LOG_FILE = "/var/log/system_hardening.log"
 APT_TIMEOUT = 600
 SYSCTL_DROPIN = "/etc/sysctl.d/99-hardening.conf"
 CRON_FILE = "/etc/cron.d/security-audits"
+APT_HARDENING_CONF = "/etc/apt/apt.conf.d/99-hardening"
 
-# === LOGGING ===
+# ================= ROOT CHECK =================
+if os.geteuid() != 0:
+    raise SystemExit("Run as root.")
+
+# ================= LOGGING =================
 Path(LOG_FILE).touch(exist_ok=True)
 logging.basicConfig(
     filename=LOG_FILE,
@@ -145,7 +150,7 @@ logging.basicConfig(
     format="%(asctime)s - %(levelname)s - %(message)s"
 )
 
-# === HELPERS ===
+# ================= HELPERS =================
 def run_command(cmd: str, exit_on_fail=True):
     env = os.environ.copy()
     env["DEBIAN_FRONTEND"] = "noninteractive"
@@ -167,17 +172,29 @@ def run_command(cmd: str, exit_on_fail=True):
         if exit_on_fail:
             raise SystemExit(1)
 
-# === APT SECURITY ===
+# ================= LOCALE FIX =================
+def fix_locale():
+    run_command("apt-get install -y locales", False)
+    run_command(
+        "sed -i 's/^# *en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/' /etc/locale.gen",
+        False
+    )
+    run_command("locale-gen", False)
+    run_command(
+        "update-locale LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8",
+        False
+    )
+
+# ================= APT HARDENING =================
 def enable_apt_security():
-    conf = """
-APT::Get::AllowUnauthenticated "false";
+    conf = """APT::Get::AllowUnauthenticated "false";
 Acquire::AllowInsecureRepositories "false";
 Acquire::AllowDowngradeToInsecureRepositories "false";
 APT::Default-Release "kali-rolling";
 """
-    Path("/etc/apt/apt.conf.d/99-hardening").write_text(conf.strip() + "\n")
+    Path(APT_HARDENING_CONF).write_text(conf)
 
-# === SYSTEM PREP ===
+# ================= SOURCES =================
 def clean_sources_list():
     src = "/etc/apt/sources.list"
     backup = src + ".bak"
@@ -188,19 +205,20 @@ def clean_sources_list():
                 if line.strip().startswith("http://"):
                     continue
                 fout.write(line)
+        run_command("apt-get update --fix-missing", exit_on_fail=False)
 
 def refresh_kali_keys():
-    tmp_asc = "/tmp/kali-archive-key.asc"
-    tmp_gpg = "/tmp/kali-archive-key.gpg"
+    asc = "/tmp/kali-archive-key.asc"
+    gpg = "/tmp/kali-archive-key.gpg"
 
-    run_command(f"wget -qO {tmp_asc} https://archive.kali.org/archive-key.asc")
-    run_command(f"gpg --dearmor -o {tmp_gpg} {tmp_asc}")
+    run_command(f"wget -qO {asc} https://archive.kali.org/archive-key.asc")
+    run_command(f"gpg --dearmor -o {gpg} {asc}")
     run_command(
-        f"install -m 644 {tmp_gpg} /etc/apt/trusted.gpg.d/kali-archive-keyring.gpg"
+        f"install -m 644 {gpg} /etc/apt/trusted.gpg.d/kali-archive-keyring.gpg"
     )
 
-    os.remove(tmp_asc)
-    os.remove(tmp_gpg)
+    os.remove(asc)
+    os.remove(gpg)
 
 def update_system():
     run_command("apt-get update --allow-releaseinfo-change")
@@ -212,7 +230,7 @@ def install_essential_tools():
         "apt-transport-https ca-certificates"
     )
 
-# === HARDENING ===
+# ================= SYSCTL HARDENING =================
 def configure_sysctl():
     settings = [
         "fs.protected_symlinks = 1",
@@ -223,10 +241,15 @@ def configure_sysctl():
         "fs.suid_dumpable = 0",
         "net.ipv4.tcp_syncookies = 1",
         "net.ipv4.icmp_echo_ignore_broadcasts = 1",
+        "net.ipv4.conf.all.accept_redirects = 0",
+        "net.ipv4.conf.default.accept_redirects = 0",
+        "net.ipv4.conf.all.log_martians = 1",
+        "net.ipv6.conf.all.accept_redirects = 0",
     ]
     Path(SYSCTL_DROPIN).write_text("\n".join(settings) + "\n")
     run_command("sysctl --system", exit_on_fail=False)
 
+# ================= SECURITY TOOLS =================
 def install_security_tools():
     pkgs = [
         "unattended-upgrades",
@@ -243,7 +266,7 @@ def install_security_tools():
 
     run_command("ufw default deny incoming", False)
     run_command("ufw default allow outgoing", False)
-    run_command("ufw allow 22/tcp", False)
+    run_command("ufw allow ssh", False)
     run_command("ufw --force enable", False)
 
     run_command(
@@ -258,7 +281,12 @@ def install_security_tools():
     run_command("systemctl enable auditd --now", False)
     run_command("systemctl enable apparmor --now", False)
 
-# === INTEGRITY ===
+    run_command(
+        "dpkg-reconfigure --priority=low unattended-upgrades",
+        False
+    )
+
+# ================= INTEGRITY =================
 def verify_package_integrity():
     result = subprocess.run(
         "debsums -as",
@@ -269,18 +297,17 @@ def verify_package_integrity():
     if result.stdout:
         Path("/var/log/integrity_failures.log").write_text(result.stdout)
 
-# === CRON ===
+# ================= CRON =================
 def setup_cron_jobs():
     content = """SHELL=/bin/sh
 PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
 
 0 3 * * * root /usr/sbin/lynis audit system --quiet
-0 2 * * * root /usr/bin/rkhunter --update --quiet && \
-/usr/bin/rkhunter --check --skip-keypress --quiet
+0 2 * * * root /usr/bin/rkhunter --update --quiet && /usr/bin/rkhunter --check --skip-keypress --quiet
 """
     Path(CRON_FILE).write_text(content)
 
-# === PERMISSIONS & CLEANUP ===
+# ================= PERMISSIONS & CLEANUP =================
 def set_permissions():
     run_command("chmod 600 /etc/shadow", False)
     run_command("chmod 600 /etc/gshadow", False)
@@ -292,12 +319,10 @@ def clean_up_system():
     run_command("apt-get autoclean", False)
     run_command("apt-get clean", False)
 
-# === MAIN ===
+# ================= MAIN =================
 def main():
-    if os.geteuid() != 0:
-        raise SystemExit("Run as root.")
-
     enable_apt_security()
+    fix_locale()
     clean_sources_list()
     refresh_kali_keys()
     update_system()
@@ -308,9 +333,9 @@ def main():
     setup_cron_jobs()
     set_permissions()
     clean_up_system()
-
     print("[SUCCESS] Kali hardening completed. Reboot recommended.")
 
 if __name__ == "__main__":
     main()
+
 ```

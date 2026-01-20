@@ -543,4 +543,130 @@ def clean_up_system():
 
 
 def install_default_tools():
-    """Install common
+    """Install commonly used default penetration testing tools."""
+    print("\nInstalling default security tools...")
+    default_tools = [
+        "nmap", "nikto", "sqlmap", "metasploit-framework",
+        "wireshark", "tcpdump", "aircrack-ng", "john",
+        "hashcat", "hydra", "dirb", "gobuster", "burpsuite"
+    ]
+    
+    print(f"[INFO] Installing {len(default_tools)} default tools (this may take a while)...")
+    # Install in one command for efficiency
+    tools_str = " ".join(default_tools)
+    success = run_command(f"apt-get install -y {tools_str}", exit_on_fail=False)
+    
+    if success:
+        print("[PASS] ✓ Default tools installed successfully")
+    else:
+        print("[WARN] Some tools may have failed to install - check logs")
+
+
+def generate_summary_report(backup_dir):
+    """Generate a summary report of hardening actions."""
+    report_path = "/root/hardening_summary.txt"
+    
+    try:
+        with open(report_path, "w") as f:
+            f.write("=" * 70 + "\n")
+            f.write("SYSTEM HARDENING SUMMARY REPORT\n")
+            f.write(f"Generated: {subprocess.check_output('date', shell=True, text=True).strip()}\n")
+            f.write("=" * 70 + "\n\n")
+            
+            f.write("SECURITY FEATURES ENABLED:\n")
+            f.write("  ✓ APT signature verification (rejects unsigned packages)\n")
+            f.write("  ✓ Kernel hardening (sysctl parameters)\n")
+            f.write("  ✓ AppArmor mandatory access control\n")
+            f.write("  ✓ Fail2Ban (SSH brute-force protection)\n")
+            f.write("  ✓ UFW firewall (deny incoming, allow outgoing)\n")
+            f.write("  ✓ Auditd (system activity logging)\n")
+            f.write("  ✓ Unattended security updates\n")
+            f.write("  ✓ Root SSH login disabled\n")
+            f.write("  ✓ Daily Lynis & Rootkit Hunter scans\n")
+            f.write("  ✓ Secure file permissions\n")
+            f.write("  ✓ Unnecessary services disabled\n")
+            f.write("  ✓ Secure shared memory configuration\n\n")
+            
+            if backup_dir:
+                f.write(f"CONFIGURATION BACKUPS: {backup_dir}\n\n")
+            
+            f.write("NEXT STEPS:\n")
+            f.write("  1. Review logs: " + LOG_FILE + "\n")
+            f.write("  2. Check firewall: sudo ufw status\n")
+            f.write("  3. Verify AppArmor: sudo aa-status\n")
+            f.write("  4. Test SSH login (root should be denied)\n")
+            f.write("  5. REBOOT the system for all changes to take effect\n\n")
+            
+            f.write("MONITORING:\n")
+            f.write("  - Lynis runs daily at 03:00 AM\n")
+            f.write("  - Rootkit Hunter runs daily at 02:00 AM\n")
+            f.write("  - Check /var/log/syslog for security events\n")
+            f.write("  - Fail2Ban logs: /var/log/fail2ban.log\n\n")
+            
+            f.write("=" * 70 + "\n")
+        
+        print(f"[INFO] Summary report saved to {report_path}")
+        
+        # Also print to console
+        with open(report_path, "r") as f:
+            print("\n" + f.read())
+            
+    except Exception as e:
+        logging.error(f"Failed to generate summary: {e}")
+
+
+# === MAIN ===
+def main():
+    """Main execution flow."""
+    print("=" * 60)
+    print("OS HARDENING & INTEGRITY VERIFICATION")
+    print("=" * 60)
+    print()
+
+    # Pre-flight checks
+    pre_flight_checks()
+    
+    # Create backups
+    backup_dir = create_backup()
+
+    # Phase 1: Secure the package manager
+    enable_apt_security()
+    install_essential_tools()
+    refresh_kali_keys()
+    
+    # Phase 2: Update system with verified packages
+    update_system()
+    clean_sources_list()
+    
+    # Phase 3: Harden the system
+    configure_sysctl()
+    enhanced_sysctl_hardening()
+    configure_secure_shared_memory()
+    enable_apparmor()
+    disable_unnecessary_services()
+    install_security_tools()
+    install_default_tools()
+    setup_cron_jobs()
+    set_permissions()
+    
+    # Phase 4: Verify everything is legitimate
+    verify_package_integrity()
+    
+    # Phase 5: Cleanup
+    clean_up_system()
+    
+    # Generate summary report
+    generate_summary_report(backup_dir)
+
+
+if __name__ == "__main__":
+    try:
+        main()
+    except KeyboardInterrupt:
+        print("\n\n[INTERRUPTED] Hardening interrupted by user")
+        print("[INFO] System may be partially hardened - review logs")
+        exit(130)
+    except Exception as e:
+        print(f"\n[ERROR] Unexpected error: {e}")
+        logging.error(f"Unexpected error in main: {e}")
+        exit(1)

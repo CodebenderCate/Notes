@@ -1,29 +1,28 @@
 # **Features**
 
 ## 1. **System Preparation**
-* **Updates & Upgrades**: Synchronizes local package indexes and performs a full system upgrade.
-* **APT Source Hardening**: Validates `/etc/apt/sources.list` to ensure communication only with official Kali mirrors.
-* **Core Essentials**: Installs utilities like `wget`, `curl`, `htop`, and `vim`, along with the OpenJDK environment for Ghidra.
-* **Dependency Management**: Deploys [apt-file](https://pkg-os.alioth.debian.org/apt-file.html) to locate missing shared libraries in the flat environment.
+* **Repository Synchronization**: Performs a comprehensive update and `dist-upgrade` to ensure all pending core packages and dependencies are fully patched.
+* **Core Essentials**: Deploys a foundational toolkit including `wget`, `curl`, `htop`, and `vim`, while provisioning the OpenJDK environment for reverse engineering suites.
+* **Dynamic Library Mapping**: Configures `apt-file` to resolve missing shared objects and headers, preventing compilation errors in a flat Linux environment.
 
 ## 2. **System & Network Hardening**
-* **Kernel Security**: Hardens the kernel via `sysctl` to restrict `dmesg`, prevent IP spoofing, and protect symlinks.
-* **Network Stealth**: Configures [UFW](https://launchpad.net/ufw) to "default deny" incoming traffic, making the VM invisible to target scans.
-* **Audit Automation**: Sets up daily [Lynis](https://cisofy.com/lynis/) audits to monitor system compliance.
+* **Kernel Parameter Tuning**: Programmatically audits `/etc/sysctl.conf` to disable IP redirects, log martian packets, and enforce protected symlinks/hardlinks.
+* **Restricted Visibility**: Implements a "default deny" UFW firewall policy to eliminate unsolicited inbound connections, ensuring stealth during active engagements.
+* **Compliance Monitoring**: Integrates [Lynis](https://cisofy.com/lynis/) to facilitate automated system auditing and identify security configuration drift.
 
 ## 3. **Integrity Checking**
-* **Package Verification**: Uses [debsums](https://manpages.debian.org/stretch/debsums/debsums.1.en.html) for high-speed validation of installed packages.
-* **Binary Authenticity**: Alerts only if critical binaries have been modified, ensuring a trustworthy environment.
+* **Binary Hash Auditing**: Utilizes `debsums` for a high-speed verification of the MD5 hashes for all files located in critical `/bin` and `/sbin` directories.
+* **Package Cross-Referencing**: Automatically maps system binaries to their respective `dpkg` owners to ensure only authentic, unmodified packages are operational.
 
 ## 4. **Modern Forensics & Tool Utility**
-* **Volatility 3 Framework**: Installs the standard for memory forensics from source for latest plugin support.
-* **Metasploit Optimization**: Initializes the [msfdb](https://www.metasploit.com) for near-instant exploit searches.
-* **Wordlist Readiness**: Decompresses the industry-standard `rockyou.txt` wordlist for immediate use.
+* **Volatility 3 Deployment**: Clones and links the latest Volatility 3 framework from source, ensuring compatibility with modern memory dump formats and symbols.
+* **Exploitation Readiness**: Automates `msfdb` initialization for high-speed Metasploit database queries and configures global symlinks for custom Python forensics tools.
+* **Automated OSINT**: Clones the [Sherlock](https://github.com/sherlock-project/sherlock) framework and manages specialized Python dependencies using pip-break-system-package protocols.
 
 ## 5. **Automated Setup & Logging**
-* **Flat Installation**: Installs a full offensive suite directly to the system without container overhead.
-* **Audit Trail**: Redirects all failures to a persistent errors.log for easy troubleshooting.
-* **Storage Optimization**: Automatically invokes autoremove to purge orphaned dependencies and clean to clear the local repository of retrieved package files.
+* **Non-Containerized Installation**: Orchestrates a direct offensive suite deployment, avoiding the performance overhead of virtualization or container layers.
+* **Error Persistence**: Maintains a detailed `errors.log` to capture standard error (stderr) from failed command executions for rapid troubleshooting.
+* **Artifact Purging**: Executes a multi-stage cleanup using `autoremove` and `clean` to reclaim disk space by removing orphaned dependencies and local package caches.
 
 ---
 
@@ -191,7 +190,7 @@ def main():
     configure_sysctl()
     setup_firewall()
     finalize_utility()
-
+    
     # 4. Integrity Check (High Speed Hash Audit)
     print("\n[*] Running hash audit on core system binaries only...")
     # Identifies packages owning files in /bin and /sbin and audits only those packages

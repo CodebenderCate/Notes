@@ -130,7 +130,7 @@ def configure_sysctl():
 def setup_firewall():
     """Configures UFW for a stealthy network posture."""
     print("\n[*] Hardening network with UFW (Stealth Mode)...")
-    run_command("apt install -y ufw")
+    run_command("apt-get install -y ufw")
     run_command("ufw default deny incoming")
     run_command("ufw default allow outgoing")
     run_command("ufw --force enable")
@@ -139,19 +139,13 @@ def finalize_utility():
     """Optimizes tool performance and prepares data."""
     print("\n[*] Finalizing tool utility...")
     run_command("msfdb init", exit_on_fail=False)
-    
-    wordlist_gz = "/usr/share/wordlists/rockyou.txt.gz"
-    wordlist_txt = "/usr/share/wordlists/rockyou.txt"
-    if os.path.exists(wordlist_gz) and not os.path.exists(wordlist_txt):
-        run_command(f"gunzip {wordlist_gz}")
-    
     run_command("apt-file update", exit_on_fail=False)
 
 def install_volatility3():
     """Installs Volatility 3 globally into /opt."""
     print("\n[*] Installing Volatility 3...")
     target_dir = "/opt/volatility3"
-    run_command("apt install -y python3-pip python3-setuptools git libpcre3-dev libarchive-dev")
+    run_command("apt-get install -y python3-pip python3-setuptools git libpcre3-dev libarchive-dev")
 
     if not os.path.exists(target_dir):
         run_command(f"git clone https://github.com/volatilityfoundation/volatility3.git {target_dir}")
@@ -161,44 +155,53 @@ def install_volatility3():
     run_command(f"ln -sf {target_dir}/vol.py /usr/local/bin/vol3")
 
 def cleanup_system():
-    """Removes junk, clears apt cache, and purges orphaned dependencies."""
+    """Removes junk, clears apt-get cache, and purges orphaned dependencies."""
     print("\n[*] Purging unnecessary packages and clearing cache...")
-    # autoremove -y: deletes packages that were auto-installed to satisfy dependencies for other packages and are now no longer needed.
-    run_command("apt autoremove -y")
-    # clean: clears out the local repository of retrieved package files (.deb files).
-    run_command("apt clean")
-    # purge: removes configuration files for uninstalled packages
-    run_command("apt autoclean")
+    run_command("apt-get autoremove -y")
+    run_command("apt-get clean")
+    run_command("apt-get autoclean")
 
 def main():
     if os.geteuid() != 0:
         exit("Error: Run as root (sudo).")
 
-    # 1. System Maintenance
-    run_command("apt update && apt upgrade -y")
+    # 1. System Maintenance - Using dist-upgrade to catch all 51 pending packages
+    run_command("apt-get update && apt-get dist-upgrade -y")
     
     # 2. Bulk Tool Install
-    essential = ["wget", "curl", "debsums", "lynis", "openjdk-17-jdk", "apt-file", "htop", "vim"]
+    essential = ["wget", "curl", "debsums", "lynis", "default-jdk", "apt-file", "htop", "vim"]
     tools = ["nmap", "sqlmap", "wireshark", "metasploit-framework", "hashcat", "john", "ghidra"]
-    utility = ["responder", "sherlock", "social-engineer-toolkit", "gobuster", "exiftool"]
+    utility = ["responder", "gobuster", "exiftool", "set"]
     
     all_packages = essential + tools + utility
-    run_command(f"apt install -y {' '.join(all_packages)}", exit_on_fail=False)
+    run_command(f"apt-get install -y {' '.join(all_packages)}", exit_on_fail=False)
+
+    # Sherlock Installation
+    sherlock_dir = "/opt/sherlock"
+    if not os.path.exists(sherlock_dir):
+        print("\n[*] Installing Sherlock via Git...")
+        run_command(f"git clone https://github.com/sherlock-project/sherlock.git {sherlock_dir}")
+    
+    req_path = os.path.join(sherlock_dir, "requirements.txt")
+    if os.path.exists(req_path):
+        run_command(f"pip3 install -r {req_path} --break-system-packages", exit_on_fail=False)
     
     # 3. Hardening and Setup
     install_volatility3()
     configure_sysctl()
     setup_firewall()
     finalize_utility()
-    
-    # 4. Integrity Check
-    print("\n[*] Verifying binary integrity...")
-    run_command("debsums -sc 2>/dev/null", exit_on_fail=False)
+
+    # 4. Integrity Check (High Speed Hash Audit)
+    print("\n[*] Running hash audit on core system binaries only...")
+    # Identifies packages owning files in /bin and /sbin and audits only those packages
+    run_command("debsums -s $(dpkg -S /bin /sbin | cut -d: -f1 | tr -d ',' | sort -u)", exit_on_fail=False)
 
     # 5. The Cleanup
     cleanup_system()
     
-    print("\n[COMPLETE] VM is hardened, optimized, and scrubbed clean.")
+    # Final message updated
+    print("\n[+] System deployment and hardening sequence finalized.")
 
 if __name__ == "__main__":
     main()

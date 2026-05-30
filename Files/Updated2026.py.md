@@ -76,12 +76,17 @@
 * [jq](https://stedolan.github.io/jq/) – JSON processor.
 * [tmux](https://github.com/tmux/tmux/wiki) – Terminal multiplexer.
 ---
+
+# Update for Kali 2026.1
+* **Updating Existing Tools**: Use `apt-get full-upgrade -y` instead of `dist-upgrade`. This is Kali’s native rolling-distribution upgrade mechanism. It updates your installed packages and resolves dependency shifts safely.
+* **Adding Missing Tools**: Filtered out the massive list of tools already built into the default Kali image (like nmap, wireshark, and metasploit). The script now explicitly targets specialized tools that do not come pre-installed but are essential for deep security research (like amass, apktool, subfinder, and bloodhound.py).
+* **Removing Unnecessary Stuff Safely**: Instead of using a blind `autoremove` (which frequently deletes core system components by mistake), the script explicitly purges known telemetry, unused debug tools, and legacy services that bloat a research machine.
+
 # The Script
 ```py
 import subprocess
 import os
 import logging
-import shutil
 import re
 
 # LOGGING: Audits every action and records errors locally.
@@ -98,7 +103,7 @@ def run_command(command, exit_on_fail=True):
             exit(1)
 
 def configure_sysctl():
-    """Hardens the kernel. Checks for existing lines to prevent duplicates."""
+    """Hardens the kernel network stack and restricts kernel pointers."""
     print("\n[*] Auditing sysctl hardening...")
     settings = {
         "net.ipv4.conf.all.accept_redirects": "0",
@@ -127,36 +132,23 @@ def configure_sysctl():
         logging.error(f"Sysctl error: {e}")
 
 def setup_firewall():
-    """Configures UFW for a stealthy network posture."""
+    """Configures UFW to block unsolicited inbound traffic while allowing analysis output."""
     print("\n[*] Hardening network with UFW (Stealth Mode)...")
     run_command("apt-get install -y ufw")
     run_command("ufw default deny incoming")
     run_command("ufw default allow outgoing")
     run_command("ufw --force enable")
 
-def finalize_utility():
-    """Optimizes tool performance and prepares data."""
-    print("\n[*] Finalizing tool utility...")
-    run_command("msfdb init", exit_on_fail=False)
-    run_command("apt-file update", exit_on_fail=False)
-
-def install_volatility3():
-    """Installs Volatility 3 globally into /opt."""
-    print("\n[*] Installing Volatility 3...")
-    target_dir = "/opt/volatility3"
-    run_command("apt-get install -y python3-pip python3-setuptools git libpcre3-dev libarchive-dev")
-
-    if not os.path.exists(target_dir):
-        run_command(f"git clone https://github.com/volatilityfoundation/volatility3.git {target_dir}")
-    else:
-        run_command(f"cd {target_dir} && git pull")
-
-    run_command(f"ln -sf {target_dir}/vol.py /usr/local/bin/vol3")
-
-def cleanup_system():
-    """Removes junk, clears apt-get cache, and purges orphaned dependencies."""
-    print("\n[*] Purging unnecessary packages and clearing cache...")
-    run_command("apt-get autoremove -y")
+def purge_unnecessary_stuff():
+    """Removes specific system bloat, telemetry, and legacy services safely."""
+    print("\n[*] Removing unnecessary system bloat and legacy components...")
+    bloat_packages = [
+        "popularity-contest",  # Disables background telemetry reporting
+        "zeitgeist-core",      # Removes local activity logging framework
+        "rsh-client",          # Removes legacy remote shell binaries
+        "telnet"               # Removes unencrypted communication binary
+    ]
+    run_command(f"apt-get purge -y {' '.join(bloat_packages)}", exit_on_fail=False)
     run_command("apt-get clean")
     run_command("apt-get autoclean")
 
@@ -164,43 +156,44 @@ def main():
     if os.geteuid() != 0:
         exit("Error: Run as root (sudo).")
 
-    # 1. System Maintenance - Using dist-upgrade to catch all 51 pending packages
-    run_command("apt-get update && apt-get dist-upgrade -y")
+    # 1. Safely synchronize repositories and update all pre-installed tools to their latest version
+    print("\n[*] Synchronizing repositories and updating all pre-installed tools natively...")
+    run_command("apt-get update && apt-get full-upgrade -y")
     
-    # 2. Bulk Tool Install
-    essential = ["wget", "curl", "debsums", "lynis", "default-jdk", "apt-file", "htop", "vim"]
-    tools = ["nmap", "sqlmap", "wireshark", "metasploit-framework", "hashcat", "john", "ghidra"]
-    utility = ["responder", "gobuster", "exiftool", "set"]
+    # 2. Install missing specialized tools and missing utilities natively through apt
+    print("\n[*] Installing missing specialized utilities via native apt...")
+    essential_utils = ["debsums", "lynis", "apt-file", "htop", "tmux"]
     
-    all_packages = essential + tools + utility
+    # These packages are either absent from base installations or newly packaged in 2026.1
+    missing_research_tools = [
+        "amass",          # Advanced subdomain enumeration
+        "subfinder",      # Passive subdomain discovery
+        "bloodhound.py",  # Python Active Directory ingestor
+        "seclists",       # Wordlists for fuzzing and security tests
+        "xsstrike",       # Brand new native package for 2026.1 (No git/pip required!)
+        "sherlock",       # Native APT package for Sherlock username searches
+        "volatility3"     # Native APT package for Volatility memory forensics
+    ]
+    
+    all_packages = essential_utils + missing_research_tools
     run_command(f"apt-get install -y {' '.join(all_packages)}", exit_on_fail=False)
 
-    # Sherlock Installation
-    sherlock_dir = "/opt/sherlock"
-    if not os.path.exists(sherlock_dir):
-        print("\n[*] Installing Sherlock via Git...")
-        run_command(f"git clone https://github.com/sherlock-project/sherlock.git {sherlock_dir}")
-    
-    req_path = os.path.join(sherlock_dir, "requirements.txt")
-    if os.path.exists(req_path):
-        run_command(f"pip3 install -r {req_path} --break-system-packages", exit_on_fail=False)
-    
-    # 3. Hardening and Setup
-    install_volatility3()
+    # 3. Apply Host Configurations
     configure_sysctl()
     setup_firewall()
-    finalize_utility()
+    
+    # Initialize framework databases
+    run_command("msfdb init", exit_on_fail=False)
+    run_command("apt-file update", exit_on_fail=False)
     
     # 4. Integrity Check (High Speed Hash Audit)
-    print("\n[*] Running hash audit on core system binaries only...")
-    # Identifies packages owning files in /bin and /sbin and audits only those packages
+    print("\n[*] Running hash audit on core system binaries...")
     run_command("debsums -s $(dpkg -S /bin /sbin | cut -d: -f1 | tr -d ',' | sort -u)", exit_on_fail=False)
 
-    # 5. The Cleanup
-    cleanup_system()
+    # 5. Safe Bloat Removal
+    purge_unnecessary_stuff()
     
-    # Final message updated
-    print("\n[+] System deployment and hardening sequence finalized.")
+    print("\n[+] Direct system update, missing tool installation, and laptop hardening finalized cleanly.")
 
 if __name__ == "__main__":
     main()
